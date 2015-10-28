@@ -1,0 +1,44 @@
+apply from: 'meddle.gradle'
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src']
+		}
+	}
+}
+
+
+greddle {
+    cacheDir = 'cache'
+}
+
+meddle {
+    version = "1.2.2"
+}
+
+dynamicmappings {
+    version = "018"
+}
+
+meddleapi {
+    version = "1.0.5"
+}
+
+minecraft {
+    version = '15w44a'
+}
+
+jar {
+    baseName = 'heavymeddle'
+    version = '1.0'
+    
+    manifest {
+		attributes('TweakClass' : 'net.fybertech.heavymeddle.HeavyTweak')
+		attributes('MeddleAPI-Mods' : 'net.fybertech.heavymeddle.HeavyMeddleMod')
+	}
+}
+

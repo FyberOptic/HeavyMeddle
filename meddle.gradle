@@ -1,0 +1,159 @@
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+/*apply plugin: MeddlePlugin
+class MeddlePlugin implements Plugin<Project> {
+    void apply(Project project) {
+        project.extensions.create("meddle", MeddlePluginExtension)        
+    }
+}*/
+
+configurations {
+  provided
+  getmc
+}
+
+sourceSets {
+    main { compileClasspath += configurations.provided }
+}
+
+
+project.extensions.add("meddle", MeddlePluginExtension)
+project.extensions.add("dynamicmappings", MeddlePluginExtension)
+project.extensions.add("meddleapi", MeddlePluginExtension)
+project.extensions.add("minecraft", MeddlePluginExtension)
+
+project.extensions.add("greddle", GreddlePluginExtension)
+
+class MeddlePluginExtension {
+    String version
+    String location = null
+}
+
+class GreddlePluginExtension {
+    String cacheDir = 'cache/'
+}
+
+
+project.ext {
+    mcJarFilename = "${->project.minecraft.version}.jar"
+    remappedJarFilename = "remapped-${->project.minecraft.version}.jar"
+}
+
+
+repositories {
+    maven {
+        //mavenCentral()
+        url "http://fybertech.net/maven/"
+        //url "https://libraries.minecraft.net/"
+    }       
+}
+
+dependencies {    
+    getmc "net.fybertech:greddle:1.0"
+    compile fileTree(dir:'cache/libraries', include: '*.jar')
+}
+
+
+afterEvaluate {
+    println 'Using Minecraft ' + project.minecraft.version
+    println 'Using Meddle v' + project.meddle.version
+    println 'Using DynamicMappings ' + project.dynamicmappings.version
+    println 'Using MeddleAPI v' + project.meddleapi.version
+    println ''
+    
+    if (project.meddle.location == null) {
+        dependencies { compile group: "net.fybertech", name: "meddle", version: "${project.meddle.version}" }
+    }
+    else {
+        dependencies { compile files(project.meddle.location) }
+    }
+    
+    if (project.dynamicmappings.location == null) {
+        dependencies { compile group: "net.fybertech", name: "dynamicmappings", version: "${project.dynamicmappings.version}" }
+    }
+    else {
+        dependencies { compile files(project.dynamicmappings.location) }
+    }
+    
+    if (project.meddleapi.location == null) {
+        dependencies { compile group: "net.fybertech", name: "meddleapi", version: "${project.meddleapi.version}" }
+    }
+    else {
+        dependencies { compile files(project.meddleapi.location) }
+    }
+
+    dependencies { runtime files(new File("${->project.greddle.cacheDir}", "${->project.ext.mcJarFilename}")) }
+    dependencies { provided files(new File("${->project.greddle.cacheDir}", "${->project.ext.remappedJarFilename}")) }
+}
+
+idea {
+    module {
+        scopes.PROVIDED.plus += [ configurations.provided ]
+    }
+}
+
+
+jar {
+    dependsOn('findMappings')
+}
+
+
+task findMappings(type: JavaExec, dependsOn:[classes]) {
+    main = 'net.fybertech.dynamicmappings.ModMappings'
+    args = [sourceSets.main.output.classesDir.getAbsolutePath(), sourceSets.main.output.resourcesDir.getAbsolutePath() + "/requiredmappings.cfg"]
+    doFirst {
+        // TODO - Look into why both jars needed
+        classpath = sourceSets.main.runtimeClasspath + configurations.provided
+    }
+}
+
+
+task getMinecraft(type: JavaExec) {
+    main = 'net.fybertech.greddle.Greddle'
+    classpath = configurations.getmc  //files('greddle-1.0.jar')
+    args = ["${->project.minecraft.version}", "${->project.greddle.cacheDir}"]
+    outputs.dir { "${->project.greddle.cacheDir}" }
+}
+
+
+task remapMinecraft(type: JavaExec, dependsOn: 'getMinecraft') {
+    doFirst {
+        classpath files(new File(project.greddle.cacheDir, "${->project.minecraft.version}" + '.jar'))
+
+        configurations.compile.resolvedConfiguration.getResolvedArtifacts().each {
+            if (it.name.equals('meddle')) classpath it.getFile()
+            else if (it.name.equals('dynamicmappings')) classpath it.getFile()
+            else if (it.name.equals('meddleapi')) classpath it.getFile()
+        }
+        
+        if (project.meddle.location != null) classpath project.meddle.location
+        if (project.meddleapi.location != null) classpath project.meddleapi.location
+        if (project.dynamicmappings.location != null) classpath project.dynamicmappings.location
+
+        classpath fileTree(new File("${->project.greddle.cacheDir}", 'libraries/'))
+        
+        args = ['-o', "${->project.greddle.cacheDir}/${->project.remappedJarFilename}"]
+    }
+    classpath sourceSets.main.resources.getSrcDirs()
+    main = 'net.fybertech.dynamicmappings.DynamicRemap'
+
+    inputs.file { files(new File("${->project.greddle.cacheDir}", "${->project.mcJarFilename}")) }
+    outputs.file { files(new File("${->project.greddle.cacheDir}", "${->project.remappedJarFilename}")) }
+}
+
+compileJava.dependsOn(remapMinecraft)
+
+
+task run(type: JavaExec) {
+    
+}
+
+
