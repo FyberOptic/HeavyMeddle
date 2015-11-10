@@ -33,6 +33,7 @@ public class HeavyMeddleMod
 	public static int maxBlocks = 300;
 	public static int maxGirth = 10;
 	public static int maxHeight = 100;
+	public static boolean ignoreLeaves = false;
 	
 	private void loadConfig()
 	{
@@ -43,6 +44,7 @@ public class HeavyMeddleMod
 		maxBlocks = config.get(ConfigFile.key("general", "maxBlocks", 300, "Maximum number of blocks that can be destroyed in a single break."));
 		maxGirth = config.get(ConfigFile.key("general", "maxGirth", 10, "Maximum radius to search for blocks in the tree, e.g., 0 = 1x1, 1 = 3x3, 2 = 5x5, etc."));
 		maxHeight = config.get(ConfigFile.key("general", "maxHeight", 100, "Maximum height to search for blocks in the tree."));
+		ignoreLeaves = config.get(ConfigFile.key("general", "ignoreLeaves", false, "Disables leaf block detection used when determining whether to destroy multiple logs."));
 		
 		if (config.hasChanged()) config.save();		
 	}
@@ -190,7 +192,7 @@ public class HeavyMeddleMod
 		if (block instanceof BlockLog && entity instanceof EntityPlayer) {
 			HashSet<BlockPos> tree = new HashSet<BlockPos>();
 			boolean hasLeaves = addNeighbors(block, world, pos, pos, (EntityPlayer)entity, tree);
-			if (hasLeaves) {
+			if (hasLeaves || ignoreLeaves) {
 				for (BlockPos currentPos : tree) {
 					if (!destroyBlock(block, world, currentPos, (EntityPlayer)entity))
 						break;
