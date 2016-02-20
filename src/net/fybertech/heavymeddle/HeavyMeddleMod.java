@@ -75,8 +75,7 @@ public class HeavyMeddleMod
 		tag.setByte("isHeavyAxe", (byte)1);
 		
 		heavyAxe.setTagCompound(tag);
-		CraftingManager.getInstance().addRecipe(heavyAxe, "II ", "IS ", " S ", 'I', Blocks.iron_block, 'S', Items.stick);
-		CraftingManager.getInstance().addRecipe(heavyAxe, " II", " SI", " S ", 'I', Blocks.iron_block, 'S', Items.stick);
+		CraftingManager.getInstance().addRecipe(heavyAxe, "II", "SI", "S ", 'I', Blocks.iron_block, 'S', Items.stick);
 	}
 	
 	/**
