@@ -3,13 +3,13 @@ apply from: 'meddle.gradle'
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
-sourceSets {
-	main {
-		java {
-			srcDirs = ['src']
-		}
-	}
-}
+//sourceSets {
+//	main {
+//		java {
+//			srcDirs = ['src']
+//		}
+//	}
+//}
 
 
 greddle {
@@ -21,7 +21,7 @@ meddle {
 }
 
 dynamicmappings {
-    version = "019"
+    version = "026"
 }
 
 meddleapi {
@@ -29,12 +29,12 @@ meddleapi {
 }
 
 minecraft {
-    version = '15w45a'
+    version = '16w32b'
 }
 
 jar {
     baseName = 'heavymeddle'
-    version = '1.0.1'
+    version = '1.0.2'
     
     manifest {
 		attributes('TweakClass' : 'net.fybertech.heavymeddle.HeavyTweak')
