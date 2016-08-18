@@ -7,7 +7,7 @@ import net.fybertech.meddle.MeddleMod;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
-@MeddleMod(id="heavymeddle", name="Heavy Meddle", author="FyberOptic", version="1.0.2")
+@MeddleMod(id="heavymeddle", name="Heavy Meddle", author="FyberOptic", version="1.0.3")
 public class HeavyTweak implements ITweaker
 {
 

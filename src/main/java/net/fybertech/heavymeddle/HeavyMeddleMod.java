@@ -131,9 +131,7 @@ public class HeavyMeddleMod
 	 * @return Whether the block was successfully destroyed by the player.
 	 */
 	public static boolean destroyBlock(Block block, World world, BlockPos pos, EntityPlayer player) {
-		// TODO - Change stackSize to getStackSize() later.  Mapping doesn't exist currently for 16w32b, so
-		//        we'll use an access transformer for now.
-		if (player.getHeldMainHandItem() == null || player.getHeldMainHandItem().stackSize < 1) return false;
+		if (player.getHeldMainHandItem() == null || player.getHeldMainHandItem().getStackSize() < 1) return false;
 		
 		IBlockState upState = world.getBlockState(pos);
 		if (upState == null) return false;				
@@ -143,8 +141,8 @@ public class HeavyMeddleMod
 			world.setBlockState(pos, Blocks.air.getDefaultState(), 3);					
 			player.getHeldMainHandItem().damageItem(1, player);
 			
-			if (player.getHeldMainHandItem().stackSize < 1) {							
-				player.setHeldItem(MainOrOffHand.MAIN_HAND, (ItemStack)null);
+			if (player.getHeldMainHandItem().getStackSize() < 1) {							
+				player.setHeldItem(MainOrOffHand.MAIN_HAND, ItemStack.NULL_STACK);
 			}					
 			
 			block.harvestBlock(world, player, pos, upState, null, player.getHeldMainHandItem() == null ? null : player.getHeldMainHandItem().copy());

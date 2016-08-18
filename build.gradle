@@ -21,7 +21,8 @@ meddle {
 }
 
 dynamicmappings {
-    version = "026"
+    version = "027"
+    //location = "../dynamicmappings/bin/"
 }
 
 meddleapi {
@@ -29,12 +30,12 @@ meddleapi {
 }
 
 minecraft {
-    version = '16w32b'
+    version = '16w33a'
 }
 
 jar {
     baseName = 'heavymeddle'
-    version = '1.0.2'
+    version = '1.0.3'
     
     manifest {
 		attributes('TweakClass' : 'net.fybertech.heavymeddle.HeavyTweak')
